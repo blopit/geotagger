@@ -7,6 +7,7 @@ var req = require('request');
 var url = require('url');
 
 var TAG_COLLECTION = "tags";
+var SEARCH_RADIUS = 300; //in meters
 
 var app = express();
 app.use(express.static(__dirname + "/public"));
@@ -16,7 +17,8 @@ app.use(bodyParser.json());
 var db;
 
 // Connect to the database before starting the application server.
-mongodb.MongoClient.connect(process.env.MONGODB_URI || "mongodb://localhost", function (err, database) {
+var mongouri = process.env.MONGODB_URI || "mongodb://localhost";
+mongodb.MongoClient.connect(mongouri, function (err, database) {
   if (err) {
     console.log(err);
     process.exit(1);
@@ -48,21 +50,37 @@ function handleError(res, reason, message, code) {
 
 app.get("/tags", function(req, res) {
 
+  if (!(req.query.latitude && req.query.longitude)) {
+    return res.status(400).json({message : "Must provide a latitude and longitude."});
+  }
+  var latitude = Number(req.query.latitude) || 0;
+  var longitude = Number(req.query.longitude) || 0;
+
+  db.collection(TAG_COLLECTION).find(
+    {
+      location:
+        { $near :
+          {
+            $geometry: { type: "Point",  coordinates: [ latitude, longitude ] },
+            $maxDistance: SEARCH_RADIUS
+          }
+        }
+    }).toArray(function(err, docs) {
+      if (err) {
+        handleError(res, err.message, "Failed to get tags.");
+      } else {
+        res.status(200).json(docs);
+      }
+    });
+});
+
+app.post("/tags", function(req, res) {
+
   if (!(req.body.latitude && req.body.longitude)) {
     return res.status(400).json({message : "Must provide a latitude and longitude."});
   }
 
-  db.collection(TAG_COLLECTION).find({}).toArray(function(err, docs) {
-    if (err) {
-      handleError(res, err.message, "Failed to get tags.");
-    } else {
-      res.status(200).json(docs);
-    }
-  });
-});
-
-app.post("/tags", function(req, res) {
-  var newTag = req.body;
+  var newTag = {};
   newTag.createDate = new Date();
 
   newTag.user = req.body.user || null;
@@ -71,9 +89,9 @@ app.post("/tags", function(req, res) {
   newTag.points = 0;
   newTag.flagged = false;
   newTag.comments = [];
-
-  if (!(req.body.latitude && req.body.longitude)) {
-    return res.status(400).json({message : "Must provide a latitude and longitude."});
+  newTag.location = {
+    type: "Point",
+    coordinates: [ req.body.latitude, req.body.longitude ]
   }
 
   db.collection(TAG_COLLECTION).insertOne(newTag, function(err, doc) {
