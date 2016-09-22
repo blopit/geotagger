@@ -88,6 +88,7 @@ app.post("/tags", function(req, res) {
   newTag.subcategory = req.body.subcategory || 'Other';
   newTag.name = req.body.name || '';
   newTag.description = req.body.description || '';
+  newTag.image = req.body.image || null;
   newTag.points = 0;
   newTag.flagged = false;
   newTag.comments = [];
