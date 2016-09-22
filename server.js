@@ -33,7 +33,7 @@ mongodb.MongoClient.connect(process.env.MONGODB_URI || "mongodb://localhost", fu
   });
 });
 
-// CONTACTS API ROUTES BELOW
+// TAGS API ROUTES BELOW
 
 // Generic error handler used by all endpoints.
 function handleError(res, reason, message, code) {
@@ -41,12 +41,17 @@ function handleError(res, reason, message, code) {
   res.status(code || 500).json({"error": message});
 }
 
-/*  "/contacts"
- *    GET: finds all contacts
- *    POST: creates a new contact
+/*  "/tags"
+ *    GET: finds all tags TODO: isolate to a region radius
+ *    POST: creates a new tags
  */
 
 app.get("/tags", function(req, res) {
+
+  if (!(req.body.latitude && req.body.longitude)) {
+    return res.status(400).json({message : "Must provide a latitude and longitude."});
+  }
+
   db.collection(TAG_COLLECTION).find({}).toArray(function(err, docs) {
     if (err) {
       handleError(res, err.message, "Failed to get tags.");
@@ -68,13 +73,11 @@ app.post("/tags", function(req, res) {
   newTag.comments = [];
 
   if (!(req.body.latitude && req.body.longitude)) {
-    //handleError(res, "Invalid user input", "Must provide a latitude and longitude.", 400);
     return res.status(400).json({message : "Must provide a latitude and longitude."});
   }
 
   db.collection(TAG_COLLECTION).insertOne(newTag, function(err, doc) {
     if (err) {
-      //handleError(res, err.message, "Failed to create new tag.");
       return res.status(500).json({message : "Failed to create new tag."});
     } else {
       return res.status(201).json(doc.ops[0]);
@@ -83,10 +86,10 @@ app.post("/tags", function(req, res) {
 
 });
 
-/*  "/contacts/:id"
- *    GET: find contact by id
- *    PUT: update contact by id
- *    DELETE: deletes contact by id
+/*  "/tags/:id"
+ *    GET: find tag by id
+ *    PUT: update tag by id
+ *    DELETE: deletes tag by id
  */
 
 app.get("/tags/:id", function(req, res) {
@@ -115,7 +118,7 @@ app.put("/tags/:id", function(req, res) {
 app.delete("/tags/:id", function(req, res) {
   db.collection(TAG_COLLECTION).deleteOne({_id: new ObjectID(req.params.id)}, function(err, result) {
     if (err) {
-      handleError(res, err.message, "Failed to delete contact");
+      handleError(res, err.message, "Failed to delete tag");
     } else {
       res.status(204).end();
     }
