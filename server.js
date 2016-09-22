@@ -83,8 +83,9 @@ app.post("/tags", function(req, res) {
   var newTag = {};
   newTag.createDate = new Date();
 
-  newTag.user = req.body.user || null;
-  newTag.type = req.body.type || 'none';
+  newTag.author = req.body.author || null;
+  newTag.category = req.body.category || 'Other';
+  newTag.name = req.body.name || '';
   newTag.description = req.body.description || '';
   newTag.points = 0;
   newTag.flagged = false;
