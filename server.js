@@ -3,6 +3,8 @@ var path = require("path");
 var bodyParser = require("body-parser");
 var mongodb = require("mongodb");
 var ObjectID = mongodb.ObjectID;
+var req = require('request');
+var url = require('url');
 
 var TAG_COLLECTION = "tags";
 
@@ -14,7 +16,7 @@ app.use(bodyParser.json());
 var db;
 
 // Connect to the database before starting the application server.
-mongodb.MongoClient.connect(process.env.MONGODB_URI, function (err, database) {
+mongodb.MongoClient.connect(process.env.MONGODB_URI || "mongodb://localhost", function (err, database) {
   if (err) {
     console.log(err);
     process.exit(1);
@@ -58,17 +60,27 @@ app.post("/tags", function(req, res) {
   var newTag = req.body;
   newTag.createDate = new Date();
 
-  if (!(req.body.latitude || req.body.longitude)) {
-    handleError(res, "Invalid user input", "Must provide a latitude and longitude.", 400);
+  newTag.user = req.body.user || null;
+  newTag.type = req.body.type || 'none';
+  newTag.description = req.body.description || '';
+  newTag.points = 0;
+  newTag.flagged = false;
+  newTag.comments = [];
+
+  if (!(req.body.latitude && req.body.longitude)) {
+    //handleError(res, "Invalid user input", "Must provide a latitude and longitude.", 400);
+    return res.status(400).json({message : "Must provide a latitude and longitude."});
   }
 
   db.collection(TAG_COLLECTION).insertOne(newTag, function(err, doc) {
     if (err) {
-      handleError(res, err.message, "Failed to create new contact.");
+      //handleError(res, err.message, "Failed to create new tag.");
+      return res.status(500).json({message : "Failed to create new tag."});
     } else {
-      res.status(201).json(doc.ops[0]);
+      return res.status(201).json(doc.ops[0]);
     }
   });
+
 });
 
 /*  "/contacts/:id"
