@@ -1,7 +1,31 @@
-# mean-contactlist
+# mean-geotagger
 
-Contact List is a RESTful API server and web application built with the MEAN stack. It is a simple example that aims to concisely demonstrate basic MEAN and REST architecture. You can find the full tutorial here: https://devcenter.heroku.com/articles/mean-apps-restful-api.
+GET
+https://geotaganything.herokuapp.com/tags?latitude=43.472839&longitude=-80.543185
 
-You can deploy a live copy of this application to Heroku with the button below.
+POST
+https://geotaganything.herokuapp.com/tags
 
-[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/chrisckchang/mean-contactlist)
+BODY:
+{
+    "author":null,
+    "category":"Food",
+    "subcategory":"Other",
+    "name":"Bon Appétit - Davis Centre",
+    "description":"blah blah blah",
+    "image":"https://uwaterloo.ca/food-services/sites/ca.food-services/files/BA.gif"
+    "latitude":43.472839,
+    "longitude":-80.543185
+}
+
+"latitude" & "longitude" are MANDATORY
+
+Defaults:
+{
+    "author":null,
+    "category":"Other",
+    "subcategory":"Other",
+    "name":"",
+    "description":"",
+    "image":"null
+}
