@@ -75,7 +75,6 @@ app.get("/tags", function(req, res) {
 });
 
 app.post("/tags", function(req, res) {
-
   if (!(req.body.latitude && req.body.longitude)) {
     return res.status(400).json({message : "Must provide a latitude and longitude."});
   }
@@ -114,7 +113,7 @@ app.post("/tags", function(req, res) {
  */
 
 app.get("/tags/:id", function(req, res) {
-  db.collection(TAG_COLLECTION).findOne({ _id: new ObjectID(req.params.id) }, function(err, doc) {
+  db.collection(TAG_COLLECTION).findOne({_id: new ObjectID(req.params.id)}, function(err, doc) {
     if (err) {
       handleError(res, err.message, "Failed to get tag");
     } else {
@@ -127,7 +126,7 @@ app.put("/tags/:id", function(req, res) {
   var updateDoc = req.body;
   delete updateDoc._id;
 
-  db.collection(TAG_COLLECTION).updateOne({_id: new ObjectID(req.params.id)}, updateDoc, function(err, doc) {
+  db.collection(TAG_COLLECTION).updateOne({_id: new ObjectID(req.params.id)}, {$set: updateDoc}, function(err, doc) {
     if (err) {
       handleError(res, err.message, "Failed to update tag");
     } else {
