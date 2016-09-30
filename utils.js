@@ -1,5 +1,7 @@
-// Generic error handler used by all endpoints.
-function handleError(res, reason, message, code) {
-  console.log("ERROR: " + reason);
-  res.status(code || 500).json({"error": message});
+module.exports = {
+	// Generic error handler used by all endpoints.
+	handleError: function(res, reason, message, code) {
+	  console.log("ERROR: " + reason);
+	  res.status(code || 500).json({"error": message});
+	}
 }

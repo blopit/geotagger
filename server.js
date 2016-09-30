@@ -26,8 +26,8 @@ mongodb.MongoClient.connect(mongouri, function (err, database) {
   console.log("Database connection ready");
 
   // Import API from other files
-  var tags = require('./tags')(app, db);
-  require('./auth/auth')(app, db);
+  require('./app/tags/tags')(app, db);
+  require('./app/auth/auth')(app, db);
 
   // Initialize the app.
   var server = app.listen(process.env.PORT || 8080, function () {

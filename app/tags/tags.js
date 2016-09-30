@@ -1,6 +1,7 @@
 var express = require("express");
 var mongodb = require("mongodb");
 var ObjectID = mongodb.ObjectID;
+var utils = require("../../utils");
 
 var TAG_COLLECTION = "tags";
 var SEARCH_RADIUS = 300; //in meters
@@ -14,7 +15,6 @@ module.exports = (function(app, db) {
    */
 
   tags.get("/", function(req, res) {
-    console.log(req.query);
 
     if (!(req.query.latitude && req.query.longitude)) {
       return res.status(400).json({message : "Must provide a latitude and longitude."});
@@ -33,7 +33,7 @@ module.exports = (function(app, db) {
           }
       }).toArray(function(err, docs) {
         if (err) {
-          handleError(res, err.message, "Failed to get tags.");
+          utils.handleError(res, err.message, "Failed to get tags.");
         } else {
           res.status(200).json(docs);
         }
@@ -65,7 +65,7 @@ module.exports = (function(app, db) {
 
     db.collection(TAG_COLLECTION).insertOne(newTag, function(err, doc) {
       if (err) {
-        return res.status(500).json({message : "Failed to create new tag."});
+        utils.handleError(res, err.message, "Failed to create new tag.");
       } else {
         return res.status(201).json(doc.ops[0]);
       }
@@ -82,7 +82,7 @@ module.exports = (function(app, db) {
   tags.get("/:id", function(req, res) {
     db.collection(TAG_COLLECTION).findOne({ _id: new ObjectID(req.params.id) }, function(err, doc) {
       if (err) {
-        handleError(res, err.message, "Failed to get tag");
+        utils.handleError(res, err.message, "Failed to get tag.");
       } else {
         res.status(200).json(doc);
       }
@@ -95,7 +95,7 @@ module.exports = (function(app, db) {
 
     db.collection(TAG_COLLECTION).updateOne({_id: new ObjectID(req.params.id)}, updateDoc, function(err, doc) {
       if (err) {
-        handleError(res, err.message, "Failed to update tag");
+        utils.handleError(res, err.message, "Failed to update tag.");
       } else {
         res.status(204).end();
       }
@@ -105,7 +105,7 @@ module.exports = (function(app, db) {
   tags.delete("/:id", function(req, res) {
     db.collection(TAG_COLLECTION).deleteOne({_id: new ObjectID(req.params.id)}, function(err, result) {
       if (err) {
-        handleError(res, err.message, "Failed to delete tag");
+        utils.handleError(res, err.message, "Failed to delete tag.");
       } else {
         res.status(204).end();
       }
