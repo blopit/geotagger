@@ -10,8 +10,8 @@ module.exports = (function(app, db) {
   var tags = express.Router();
 
   /*  "/tags"
-   *    GET: finds all tags TODO: isolate to a region radius
-   *    POST: creates a new tags
+   *    GET: finds all tags
+   *    POST: creates a new tag
    */
 
   tags.get("/", function(req, res) {
@@ -43,7 +43,7 @@ module.exports = (function(app, db) {
   tags.post("/", function(req, res) {
 
     if (!(req.body.latitude && req.body.longitude)) {
-      return res.status(400).json({message : "Must provide a latitude and longitude."});
+      return res.status(400).json({ message : "Must provide a latitude and longitude." });
     }
 
     var newTag = {};
@@ -79,7 +79,7 @@ module.exports = (function(app, db) {
    *    DELETE: deletes tag by id
    */
 
-  tags.get("/:id", function(req, res) {
+  tags.get("/:id/", function(req, res) {
     db.collection(TAG_COLLECTION).findOne({ _id: new ObjectID(req.params.id) }, function(err, doc) {
       if (err) {
         utils.handleError(res, err.message, "Failed to get tag.");
@@ -89,7 +89,7 @@ module.exports = (function(app, db) {
     });
   });
 
-  tags.put("/:id", function(req, res) {
+  tags.put("/:id/", function(req, res) {
     var updateDoc = req.body;
     delete updateDoc._id;
 
@@ -102,7 +102,7 @@ module.exports = (function(app, db) {
     });
   });
 
-  tags.delete("/:id", function(req, res) {
+  tags.delete("/:id/", function(req, res) {
     db.collection(TAG_COLLECTION).deleteOne({_id: new ObjectID(req.params.id)}, function(err, result) {
       if (err) {
         utils.handleError(res, err.message, "Failed to delete tag.");
