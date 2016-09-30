@@ -10,7 +10,7 @@ module.exports = (function(app, db) {
   var tags = express.Router();
 
   /*  "/tags"
-   *    GET: finds all tags
+   *    GET: finds all tags within a certain range
    *    POST: creates a new tag
    */
 
@@ -80,7 +80,7 @@ module.exports = (function(app, db) {
    */
 
   tags.get("/:id/", function(req, res) {
-    db.collection(TAG_COLLECTION).findOne({ _id: new ObjectID(req.params.id) }, function(err, doc) {
+    db.collection(TAG_COLLECTION).findOne({_id: new ObjectID(req.params.id)}, function(err, doc) {
       if (err) {
         utils.handleError(res, err.message, "Failed to get tag.");
       } else {
@@ -93,7 +93,7 @@ module.exports = (function(app, db) {
     var updateDoc = req.body;
     delete updateDoc._id;
 
-    db.collection(TAG_COLLECTION).updateOne({_id: new ObjectID(req.params.id)}, updateDoc, function(err, doc) {
+    db.collection(TAG_COLLECTION).updateOne({_id: new ObjectID(req.params.id)}, {$set: updateDoc}, function(err, doc) {
       if (err) {
         utils.handleError(res, err.message, "Failed to update tag.");
       } else {

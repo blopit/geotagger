@@ -11,7 +11,6 @@ module.exports = (function(app, db) {
 
   /*  "/auth"
    *    POST: creates a new user
-   *    GET: gets a list of users
    */
 
   auth.post("/", function(req, res) {
@@ -40,32 +39,49 @@ module.exports = (function(app, db) {
 	      if (err) {
 	        utils.handleError(res, err.message, "Failed to create new user.");
 	      } else {
-	        return res.status(201).json(doc.ops[0]);
+	        return res.status(201).json(_filterUser(doc.ops[0]));
 	      }
 	    });
 	}
   });
 
-  auth.get("/", function(req, res) {
-  	console.log("HI");
-  });
-
-  /*  "/auth"
-   *    PUT: modifies a user
+  /*  "/auth/:id"
    *    GET: gets data for a user
+   *    PUT: modifies a user
    *    DELETE: deletes a user
    */
 
-  auth.put("/:id", function(req, res) {
-  	console.log("HI");
+  auth.get("/:id", function(req, res) {
+  	db.collection(USER_COLLECTION).findOne({ _id: new ObjectID(req.params.id) }, function(err, doc) {
+      if (err) {
+        utils.handleError(res, err.message, "Failed to get tag.");
+      } else {
+        res.status(200).json(_filterUser(doc));
+      }
+    });
   });
 
-  auth.get("/:id", function(req, res) {
-  	console.log("HI");
+  auth.put("/:id", function(req, res) {
+  	var updateDoc = req.body;
+    delete updateDoc._id;
+
+    db.collection(USER_COLLECTION).updateOne({_id: new ObjectID(req.params.id)}, {$set: updateDoc}, function(err, doc) {
+      if (err) {
+        utils.handleError(res, err.message, "Failed to update tag.");
+      } else {
+        res.status(204).end();
+      }
+    });
   });
 
   auth.delete("/:id", function(req, res) {
-  	console.log("HI");
+  	db.collection(USER_COLLECTION).deleteOne({_id: new ObjectID(req.params.id)}, function(err, result) {
+      if (err) {
+        utils.handleError(res, err.message, "Failed to delete tag.");
+      } else {
+        res.status(204).end();
+      }
+    });
   });
 
   /*  "/auth/login"
@@ -83,6 +99,17 @@ module.exports = (function(app, db) {
   auth.post("/logout/", function(req, res) {
   	console.log("HI");
   });
+
+  // HELPER FUNCTIONS
+
+  // Filters the user to avoid sending any password information
+  function _filterUser(user) {
+  	var filteredUser = {};
+
+  	filteredUser.username = user.username;
+  	filteredUser.privilege = user.privilege;
+  	return filteredUser;
+  }
 
   app.use('/auth', auth);
 });
