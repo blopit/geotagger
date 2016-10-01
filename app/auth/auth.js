@@ -8,12 +8,13 @@ var USER_COLLECTION = "users";
 
 module.exports = (function(app, db) {
   var auth = express.Router();
+  var authM = require("../auth/auth.middleware")(app, db);
 
   /*  "/auth"
    *    POST: creates a new user
    */
 
-  auth.post("/", function(req, res) {
+  function createUser(req, res) {
   	
   	if (!(req.body.username && req.body.password)) {
       return res.status(400).json({ message : "Must provide a username and password." });
@@ -44,7 +45,7 @@ module.exports = (function(app, db) {
 	      }
 	    });
 	}
-  });
+  };
 
   /*  "/auth/:id"
    *    GET: gets data for a user
@@ -52,7 +53,7 @@ module.exports = (function(app, db) {
    *    DELETE: deletes a user
    */
 
-  auth.get("/:id/", function(req, res) {
+  function getUser(req, res) {
   	db.collection(USER_COLLECTION).findOne({ _id: new ObjectID(req.params.id) }, function(err, doc) {
       if (err) {
         utils.handleError(res, err.message, "Failed to get user.");
@@ -60,9 +61,9 @@ module.exports = (function(app, db) {
         res.status(200).json(_filterUser(doc));
       }
     });
-  });
+  };
 
-  auth.put("/:id/", function(req, res) {
+  function updateUser(req, res) {
   	var updateDoc = req.body;
     delete updateDoc._id;
 
@@ -73,9 +74,9 @@ module.exports = (function(app, db) {
         res.status(204).end();
       }
     });
-  });
+  };
 
-  auth.delete("/:id/", function(req, res) {
+  function deleteUser(req, res) {
   	db.collection(USER_COLLECTION).deleteOne({_id: new ObjectID(req.params.id)}, function(err, result) {
       if (err) {
         utils.handleError(res, err.message, "Failed to delete user.");
@@ -83,13 +84,13 @@ module.exports = (function(app, db) {
         res.status(204).end();
       }
     });
-  });
+  };
 
   /*  "/auth/login"
    *    POST: validates password and creates auth token
    */
 
-  auth.post("/login/", function(req, res) {
+  function login(req, res) {
 
   	if (!(req.body.username && req.body.password)) {
       return res.status(401).json({ message : "Missing username or password." });
@@ -100,7 +101,6 @@ module.exports = (function(app, db) {
       if (err) {
         utils.handleError(res, err.message, "Failed to get user.");
       } else if (!doc) {
-      	console.log("NOOB");
       	res.status(401).json({ message : "Invalid username or password." });
       } else {
         crypto.pbkdf2(req.body.password, doc.salt, 100000, 512, 'sha512', cryptoCallback(doc));
@@ -113,7 +113,6 @@ module.exports = (function(app, db) {
     		if (err) {
     			utils.handleError(res, err.message, "Failed to create password hash.");
     		} else if (user.password_hash != key.toString('hex')) {
-    			console.log("HI");
     			res.status(401).json({ message : "Invalid username or password." });
     		} else {
     			user.auth_token = crypto.randomBytes(256).toString('hex');
@@ -140,23 +139,23 @@ module.exports = (function(app, db) {
     		}
     	};
     }
-  });
+  };
 
   /*  "/auth/logout"
    *    POST: destroys auth token
    */
 
-  auth.post("/logout/", function(req, res) {
+  function logout(req, res) {
   	var updateDoc = {auth_token_hash: ""};
 
-  	db.collection(USER_COLLECTION).updateOne({username: req.body.username}, {$unset: updateDoc}, function(err, result) {
+  	db.collection(USER_COLLECTION).updateOne({username: req.user.username}, {$unset: updateDoc}, function(err, result) {
       if (err) {
         utils.handleError(res, err.message, "Failed to log out.");
       } else {
         res.status(200).end();
       }
     });
-  });
+  };
 
   // HELPER FUNCTIONS
 
@@ -171,5 +170,15 @@ module.exports = (function(app, db) {
   	return filteredUser;
   }
 
-  app.use('/auth', auth);
+  app.use('/auth/', auth);
+
+  app.post('/auth/', createUser);
+
+  app.get('/auth/:id/', authM.validateUser, getUser);
+  app.put('/auth/:id/', authM.validateUser, updateUser);
+  app.delete('/auth/:id/', authM.validateUser, deleteUser);
+
+  app.post('/auth/login/', login);
+
+  app.post('/auth/logout/', authM.validateUser, logout);
 });

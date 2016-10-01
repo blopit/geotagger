@@ -42,18 +42,18 @@ module.exports = (function(app, db) {
   };
 
   function createTag(req, res) {
+    var newTag = {};
 
     if (!(req.body.latitude && req.body.longitude)) {
       return res.status(400).json({ message : "Must provide a latitude and longitude." });
     }
 
-    var newTag = {};
     newTag.createDate = new Date();
 
-    newTag.author       = req.body.author || null;
+    newTag.author       = req.user.username;
     newTag.category     = req.body.category || 'Other';
     newTag.subcategory  = req.body.subcategory || 'Other';
-    newTag.name         = req.body.name || '';
+    newTag.name         = req.body.name || 'Untitled';
     newTag.description  = req.body.description || '';
     newTag.image        = req.body.image || null;
     newTag.points       = 0;
@@ -118,7 +118,7 @@ module.exports = (function(app, db) {
   app.get('/tags/', getTagsInRange);
   app.post('/tags/', authM.validateUser, createTag);
 
-  app.get('/tags/:id', getTag);
-  app.put('/tags/:id', authM.validateUser, updateTag);
-  app.delete('/tags/:id', authM.validateUser, deleteTag);
+  app.get('/tags/:id/', getTag);
+  app.put('/tags/:id/', authM.validateUser, updateTag);
+  app.delete('/tags/:id/', authM.validateUser, deleteTag);
 });
