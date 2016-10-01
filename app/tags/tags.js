@@ -1,20 +1,21 @@
-var express = require("express");
-var mongodb = require("mongodb");
-var ObjectID = mongodb.ObjectID;
-var utils = require("../../utils");
+var express   = require("express");
+var mongodb   = require("mongodb");
+var ObjectID  = mongodb.ObjectID;
+var utils     = require("../../utils");
 
 var TAG_COLLECTION = "tags";
 var SEARCH_RADIUS = 300; //in meters
 
 module.exports = (function(app, db) {
   var tags = express.Router();
+  var authM = require("../auth/auth.middleware")(app, db);
 
   /*  "/tags"
    *    GET: finds all tags within a certain range
    *    POST: creates a new tag
    */
 
-  tags.get("/", function(req, res) {
+  function getTagsInRange(req, res) {
 
     if (!(req.query.latitude && req.query.longitude)) {
       return res.status(400).json({message : "Must provide a latitude and longitude."});
@@ -38,9 +39,9 @@ module.exports = (function(app, db) {
           res.status(200).json(docs);
         }
       });
-  });
+  };
 
-  tags.post("/", function(req, res) {
+  function createTag(req, res) {
 
     if (!(req.body.latitude && req.body.longitude)) {
       return res.status(400).json({ message : "Must provide a latitude and longitude." });
@@ -71,7 +72,7 @@ module.exports = (function(app, db) {
       }
     });
 
-  });
+  };
 
   /*  "/tags/:id"
    *    GET: find tag by id
@@ -79,7 +80,7 @@ module.exports = (function(app, db) {
    *    DELETE: deletes tag by id
    */
 
-  tags.get("/:id/", function(req, res) {
+  function getTag(req, res) {
     db.collection(TAG_COLLECTION).findOne({_id: new ObjectID(req.params.id)}, function(err, doc) {
       if (err) {
         utils.handleError(res, err.message, "Failed to get tag.");
@@ -87,9 +88,9 @@ module.exports = (function(app, db) {
         res.status(200).json(doc);
       }
     });
-  });
+  };
 
-  tags.put("/:id/", function(req, res) {
+  function updateTag(req, res) {
     var updateDoc = req.body;
     delete updateDoc._id;
 
@@ -100,9 +101,9 @@ module.exports = (function(app, db) {
         res.status(204).end();
       }
     });
-  });
+  };
 
-  tags.delete("/:id/", function(req, res) {
+  function deleteTag(req, res) {
     db.collection(TAG_COLLECTION).deleteOne({_id: new ObjectID(req.params.id)}, function(err, result) {
       if (err) {
         utils.handleError(res, err.message, "Failed to delete tag.");
@@ -110,7 +111,14 @@ module.exports = (function(app, db) {
         res.status(204).end();
       }
     });
-  });
+  };
 
-  app.use('/tags', tags);
+  app.use('/tags/', tags);
+
+  app.get('/tags/', getTagsInRange);
+  app.post('/tags/', authM.validateUser, createTag);
+
+  app.get('/tags/:id', getTag);
+  app.put('/tags/:id', authM.validateUser, updateTag);
+  app.delete('/tags/:id', authM.validateUser, deleteTag);
 });

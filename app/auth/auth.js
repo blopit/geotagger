@@ -23,7 +23,7 @@ module.exports = (function(app, db) {
     newUser.createDate = new Date();
 
     newUser.username	= req.body.username;
-    newUser.privilege	= req.body.privilege || 'default'; // valid privileges are default and admin
+    newUser.privilege	= 'default'; // valid privileges are default and admin
     newUser.salt		= crypto.randomBytes(256).toString('hex');
 
     crypto.pbkdf2(req.body.password, newUser.salt, 100000, 512, 'sha512', cryptoCallback);
@@ -148,7 +148,7 @@ module.exports = (function(app, db) {
 
   auth.post("/logout/", function(req, res) {
   	var updateDoc = {auth_token_hash: ""};
-  	
+
   	db.collection(USER_COLLECTION).updateOne({username: req.body.username}, {$unset: updateDoc}, function(err, result) {
       if (err) {
         utils.handleError(res, err.message, "Failed to log out.");
