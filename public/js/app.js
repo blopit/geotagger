@@ -5,6 +5,15 @@ app
   var ctrl = this;
   ctrl.geoTags = [];
   ctrl.curTag;
+  ctrl.inputFields = {
+    latitude: 42,
+    longitude: 75,
+    name: 'Untitled',
+    category: 'Other',
+    subcategory: 'Other',
+    description: '',
+    image: null,
+  };
   
   NgMap.getMap().then(function(map) {
     // Print debug info.
@@ -19,6 +28,10 @@ app
     console.log('markers', map.markers);
     console.log('shapes', map.shapes);
   });
+
+  ctrl.addMarker = () => {
+    
+  }
 
   ctrl.toggleInfoWindow = (e, tag) => {
     if (ctrl.curTag == tag){
