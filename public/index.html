@@ -17,14 +17,16 @@
     <script src="/js/app.js"></script>
   </head>
 
-  <body>
+  <body ng-controller="MapController as $ctrl">
     <!-- Google Maps -->
-    <ng-map ng-controller="MapController as $ctrl" zoom="11" center="[40.74, -74.18]">
-      <!--info-window id="foo-iw">
-        <div>
-          test test asdf
+    <ng-map default-style="true" zoom="11" center="[40.74, -74.18]">
+      <info-window id="foo">
+        <div ng-non-bindable="">
+          <div>
+            {{$ctrl.curTag.name}}
+          </div>
         </div>
-      </info-window-->
+      </info-window>
       <marker ng-repeat="tag in $ctrl.geoTags track by $index" 
         id="{{$index}}"
         position="{{tag.position}}" 
@@ -32,7 +34,7 @@
         animation="{{tag.animation}}" 
         draggable="{{tag.draggable}}" 
         icon="{{tag.icon}}"
-        on-click="$ctrl.showDetail(event, $index)">
+        on-click="$ctrl.toggleInfoWindow(event, tag)">
       </marker>
       
       <!--marker position="[40.77, -74.15]" title="from"></marker>

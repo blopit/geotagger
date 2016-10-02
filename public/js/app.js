@@ -20,9 +20,23 @@ app
     console.log('shapes', map.shapes);
   });
 
-  ctrl.showDetail = (e, tagId) => {
-    ctrl.curTag = ctrl.geoTags[tagId];
-    ctrl.map.showInfoWindow('foo-iw', this);
+  ctrl.toggleInfoWindow = (e, tag) => {
+    if (ctrl.curTag == tag){
+      ctrl.hideDetail();
+      ctrl.curTag = undefined;
+    } else {
+      ctrl.showDetail(e,tag);
+    }
+  }
+
+  ctrl.showDetail = (e, tag) => {
+    ctrl.curTag = tag;
+    ctrl.map.showInfoWindow('foo', ctrl.geoTags.indexOf(ctrl.curTag).toString());
+    console.log('clicked ' + ctrl.curTag.name +", id: "+ ctrl.geoTags.indexOf(ctrl.curTag));
+  };
+
+  ctrl.hideDetail = () => {
+    ctrl.map.hideInfoWindow('foo');
   };
 
 });
