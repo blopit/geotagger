@@ -20,11 +20,11 @@
   <body>
     <!-- Google Maps -->
     <ng-map ng-controller="MapController as $ctrl" zoom="11" center="[40.74, -74.18]">
-      <info-window id="foo-iw">
+      <!--info-window id="foo-iw">
         <div>
           test test asdf
         </div>
-      </info-window>
+      </info-window-->
       <marker ng-repeat="tag in $ctrl.geoTags track by $index" 
         id="{{$index}}"
         position="{{tag.position}}" 
