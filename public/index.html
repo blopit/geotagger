@@ -27,8 +27,15 @@
         </div>
       </div>
     </info-window>
-    <marker ng-repeat="tag in $ctrl.geoTags track by $index" id="{{$index}}" position="{{tag.position}}" title="{{tag.name}}"
-      animation="{{tag.animation}}" draggable="{{tag.draggable}}" icon="{{tag.icon}}" on-click="$ctrl.toggleInfoWindow(event, tag)">
+    <marker
+           ng-repeat="tag in geoTags track by $index"
+           id="{{$index}}"
+           position="{{tag.position}}"
+           title="{{tag.name}}"
+           animation="{{tag.animation}}"
+           draggable="{{tag.draggable}}"
+           icon="{{tag.icon}}"
+           on-click="$ctrl.toggleInfoWindow(event, tag)">
     </marker>
 
     <!--marker position="[40.77, -74.15]" title="from"></marker>
@@ -40,11 +47,11 @@
       <h2>Create Tag</h2>
       <div class="form-group">
         <label for="latitude">Latitude</label>
-        <input type="number" step="any" class="form-control" id="latitude" ng-model="$ctrl.inputFields.position[0]">
+        <input type="number" step="any" class="form-control" id="latitude" ng-model="$ctrl.map.getCenter().lat()">
       </div>
       <div class="form-group">
         <label for="longitude">Longitude</label>
-        <input type="number" step="any" class="form-control" id="longitude" ng-model="$ctrl.inputFields.position[1]">
+        <input type="number" step="any" class="form-control" id="longitude" ng-model="$ctrl.map.getCenter().lng()">
       </div>
       <div class="form-group">
         <label for="name">Tag Name</label>

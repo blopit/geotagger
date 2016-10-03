@@ -1,11 +1,7 @@
-//var tags = require("../../tags/tags");
-
-var app = angular.module('geotagger', ['ngMap']);
-
-app
-  .controller('MapController', function ($scope, NgMap) {
+angular.module('geotagger', ['ngMap'])
+.controller('MapController', function ($scope, NgMap, $http) {
     var ctrl = this;
-    ctrl.geoTags = [];
+    $scope.geoTags = [];  // Popular via AJAX request.
     ctrl.curTag;
     ctrl.inputFields = {
       position: [40.77, -74.15],
@@ -19,18 +15,31 @@ app
     NgMap.getMap().then(function (map) {
       // Print debug info.
       ctrl.map = map;
-      ctrl.geoTags.push({ position: [40.71, -74.21], name: "hello" });
-      ctrl.geoTags.push({ position: [40.72, -74.20], name: "marker", animation: "Animation.DROP" });
-      ctrl.geoTags.push({ position: [40.73, -74.19], name: "drag me", draggable: true });
-      ctrl.geoTags.push({ position: [40.74, -74.18], name: "how", animation: "Animation.BOUNCE" });
-      ctrl.geoTags.push({ position: [40.75, -74.17], name: "are" });
-      ctrl.geoTags.push({ position: [40.76, -74.16], name: "you", icon: "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png" });
-      console.log(map.getCenter());
-      console.log('markers', map.markers);
-      console.log('shapes', map.shapes);
+      $scope.geoTags.push({ position: [40.71, -74.21], name: "hello" });
+      $scope.geoTags.push({ position: [40.72, -74.20], name: "marker", animation: "Animation.DROP" });
+      $scope.geoTags.push({ position: [40.73, -74.19], name: "drag me", draggable: true });
+      $scope.geoTags.push({ position: [40.74, -74.18], name: "how", animation: "Animation.BOUNCE" });
+      $scope.geoTags.push({ position: [40.75, -74.17], name: "are" });
+      $scope.geoTags.push({ position: [40.76, -74.16], name: "you", icon: "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png" });
+
+      var center = {latitude: 43.47, longitude: -80.54}; // Default center is Waterloo.
+      if (map.getCenter()) {
+        var center = {latitude: map.getCenter().lat(), longitude: map.getCenter().lon()};
+      }
+      $http({
+        url: 'tags',
+        params: center
+      }).success(function(data) {
+        console.log(data);
+        angular.forEach(data, function (tag) {
+          $scope.geoTags.push({position: tag.location.coordinates, name: tag.name});
+        });
+      }).error(function(data) {
+          console.log("Failed reading HTTP");
+      });
     });
 
-    /*$scope.$watchCollection(function() {return ctrl.geoTags; }, function (newVal, oldVal) {
+    /*$scope.$watchCollection(function() {return $scope.geoTags; }, function (newVal, oldVal) {
       console.log('markers', newVal);
       var i = newVal.length - 1;
         var latlng = new google.maps.LatLng(newVal[i].position[0],newVal[i].position[1]);
@@ -51,7 +60,7 @@ app
         return;
       }
       console.log('Creating tag', ctrl.inputFields);
-      ctrl.geoTags.push(ctrl.inputFields);
+      $scope.geoTags.push(ctrl.inputFields);
     }
 
     ctrl.toggleInfoWindow = (e, tag) => {
@@ -65,8 +74,8 @@ app
 
     ctrl.showDetail = (e, tag) => {
       ctrl.curTag = tag;
-      ctrl.map.showInfoWindow('foo', ctrl.geoTags.indexOf(ctrl.curTag).toString());
-      console.log('clicked ' + ctrl.curTag.name + ", id: " + ctrl.geoTags.indexOf(ctrl.curTag));
+      ctrl.map.showInfoWindow('foo', $scope.geoTags.indexOf(ctrl.curTag).toString());
+      console.log('clicked ' + ctrl.curTag.name + ", id: " + $scope.geoTags.indexOf(ctrl.curTag));
     };
 
     ctrl.hideDetail = () => {
