@@ -26,7 +26,7 @@ module.exports = (function(app, db) {
     db.collection(TAG_COLLECTION).find(
       {
         location:
-          { $near :
+          { $nearSphere :
             {
               $geometry: { type: "Point",  coordinates: [ latitude, longitude ] },
               $maxDistance: SEARCH_RADIUS
