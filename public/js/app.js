@@ -73,4 +73,11 @@ app
       ctrl.map.hideInfoWindow('foo');
     };
 
+    ctrl.register = () => {
+      console.log('Register: ' + ctrl.register.user + '/' + ctrl.register.pass);
+    };
+
+    ctrl.login = () => {
+      console.log('Login: ' + ctrl.login.user + '/' + ctrl.login.pass);
+    };
   });

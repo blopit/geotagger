@@ -19,7 +19,7 @@
 
 <body ng-controller="MapController as $ctrl">
   <!-- Google Maps -->
-  <ng-map default-style="true" zoom="16" center="currentlocation" geo-fallback-center="[43.47, -80.54]">
+  <ng-map default-style="true" zoom="16" center="current-location" geo-fallback-center="[43.47, -80.54]">
     <info-window id="foo">
       <div ng-non-bindable="">
         <div>
@@ -37,6 +37,7 @@
   </ng-map>
   <div class="container">
     <form>
+      <h2>Create Tag</h2>
       <div class="form-group">
         <label for="latitude">Latitude</label>
         <input type="number" step="any" class="form-control" id="latitude" ng-model="$ctrl.inputFields.position[0]">
@@ -79,6 +80,50 @@
         <small id="fileHelp" class="form-text text-muted">Image URL</small>
       </div>
       <button type="submit" class="btn btn-primary" ng-click="$ctrl.createTag()">Submit</button>
+    </form>
+  </div>
+
+  <div class="container">
+    <form>
+      <h2>Register</h2>
+      <div class="form-group">
+        <label>
+          Username
+          <input type="text" class="form-control" ng-model="$ctrl.register.user">
+        </label>
+      </div>
+      <div class="form-group">
+        <label>
+          Password
+          <input type="password" class="form-control" ng-model="$ctrl.register.pass">
+        </label>
+      </div>
+      <div class="form-group">
+        <label>
+          Retype password
+          <input type="password" class="form-control" ng-model="$ctrl.register.pass2">
+        </label>
+      </div>
+      <button type="submit" class="btn btn-primary" ng-click="$ctrl.register()">Register</button>
+    </form>
+  </div>
+
+  <div class="container">
+    <form>
+      <h2>Login</h2>
+      <div class="form-group">
+        <label>
+          Username
+          <input type="text" class="form-control" ng-model="$ctrl.login.user">
+        </label>
+      </div>
+      <div class="form-group">
+        <label>
+          Password
+          <input type="password" class="form-control" ng-model="$ctrl.login.pass">
+        </label>
+      </div>
+      <button type="submit" class="btn btn-primary" ng-click="$ctrl.login()">Login</button>
     </form>
   </div>
 </body>
