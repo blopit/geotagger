@@ -34,7 +34,7 @@ app
       console.log('markers', newVal);
       var i = newVal.length - 1;
         var latlng = new google.maps.LatLng(newVal[i].position[0],newVal[i].position[1]);
-     
+
         var newTag = new google.maps.Marker({
            position: latlng,
            icon: newVal[i].icon,
@@ -42,7 +42,7 @@ app
          });
          newTag.setPosition(latlng);
          newTag.setMap(ctrl.map);
-       
+
     });*/
 
     ctrl.createTag = () => {
