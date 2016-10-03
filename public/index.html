@@ -15,11 +15,23 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
 
   <script src="/js/app.js"></script>
+  <style>
+    ng-map {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
+    .footer {
+      position: absolute;
+      bottom: 1em;
+      left: 1em;
+    }
+  </style>
 </head>
 
 <body ng-controller="MapController as $ctrl">
   <!-- Google Maps -->
-  <ng-map default-style="true" zoom="16" center="current-location" geo-fallback-center="[43.47, -80.54]">
+  <ng-map default-style="false" zoom="16" center="current-location" geo-fallback-center="[43.47, -80.54]">
     <info-window id="foo">
       <div ng-non-bindable="">
         <div>
@@ -37,101 +49,157 @@
            icon="{{tag.icon}}"
            on-click="$ctrl.toggleInfoWindow(event, tag)">
     </marker>
-
-    <!--marker position="[40.77, -74.15]" title="from"></marker>
-      <marker position="[40.78, -74.14]" title="allen"></marker-->
-
   </ng-map>
-  <div class="container">
-    <form>
-      <h2>Create Tag</h2>
-      <div class="form-group">
-        <label for="latitude">Latitude</label>
-        <input type="number" step="any" class="form-control" id="latitude" ng-model="$ctrl.map.getCenter().lat()">
-      </div>
-      <div class="form-group">
-        <label for="longitude">Longitude</label>
-        <input type="number" step="any" class="form-control" id="longitude" ng-model="$ctrl.map.getCenter().lng()">
-      </div>
-      <div class="form-group">
-        <label for="name">Tag Name</label>
-        <input type="text" class="form-control" id="name" ng-model="$ctrl.inputFields.name">
-      </div>
-      <!--div class="form-group">
-        <label for="author">Author</label>
-        <input type="text" class="form-control" id="author" placeholder="anon">
-      </div-->
-      <div class="form-group">
-        <label for="category">Category</label>
-        <select class="form-control" id="category" ng-model="$ctrl.inputFields.category">
-          <option>Other</option>
-          <option>Services</option>
-          <option>Structures</option>
-          <option>Shops</option>
-          <option>Scenery</option>
-          <option>Food&Drink</option>
-          <option>Emergency</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="subCategory">Sub Category</label>
-        <input type="text" class="form-control" id="subCategory" ng-model="$ctrl.inputFields.subcategory">
-      </div>
-      <div class="form-group">
-        <label for="description">Description</label>
-        <textarea class="form-control" id="description" rows="3" ng-model="$ctrl.inputFields.description"></textarea>
-      </div>
-      <div class="form-group">
-        <label for="image">Image</label>
-        <input type="url" class="form-control" id="image" aria-describedby="fileHelp" ng-model="$ctrl.inputFields.icon">
-        <small id="fileHelp" class="form-text text-muted">Image URL</small>
-      </div>
-      <button type="submit" class="btn btn-primary" ng-click="$ctrl.createTag()">Submit</button>
-    </form>
+
+  <div class="footer">
+    <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#tagModal">
+      Create tag
+    </button>
+    <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#registerModal">
+      Register
+    </button>
+    <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#loginModal">
+      Login
+    </button>
   </div>
 
-  <div class="container">
-    <form>
-      <h2>Register</h2>
-      <div class="form-group">
-        <label>
-          Username
-          <input type="text" class="form-control" ng-model="$ctrl.register.user">
-        </label>
+  <!-- Create tag modal -->
+  <div class="modal fade" id="tagModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <form>
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <h4 class="modal-title" id="myModalLabel">Create Tag</h4>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="latitude">Latitude</label>
+              <input type="number" step="any" class="form-control" id="latitude" ng-model="$ctrl.map.getCenter().lat()">
+            </div>
+            <div class="form-group">
+              <label for="longitude">Longitude</label>
+              <input type="number" step="any" class="form-control" id="longitude" ng-model="$ctrl.map.getCenter().lng()">
+            </div>
+            <div class="form-group">
+              <label for="name">Tag Name</label>
+              <input type="text" class="form-control" id="name" ng-model="$ctrl.inputFields.name">
+            </div>
+            <!--div class="form-group">
+              <label for="author">Author</label>
+              <input type="text" class="form-control" id="author" placeholder="anon">
+            </div-->
+            <div class="form-group">
+              <label for="category">Category</label>
+              <select class="form-control" id="category" ng-model="$ctrl.inputFields.category">
+                <option>Other</option>
+                <option>Services</option>
+                <option>Structures</option>
+                <option>Shops</option>
+                <option>Scenery</option>
+                <option>Food&Drink</option>
+                <option>Emergency</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="subCategory">Sub Category</label>
+              <input type="text" class="form-control" id="subCategory" ng-model="$ctrl.inputFields.subcategory">
+            </div>
+            <div class="form-group">
+              <label for="description">Description</label>
+              <textarea class="form-control" id="description" rows="3" ng-model="$ctrl.inputFields.description"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="image">Image</label>
+              <input type="url" class="form-control" id="image" aria-describedby="fileHelp" ng-model="$ctrl.inputFields.icon">
+              <small id="fileHelp" class="form-text text-muted">Image URL</small>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary" ng-click="$ctrl.createTag()">Submit</button>
+          </div>
+        </form>
       </div>
-      <div class="form-group">
-        <label>
-          Password
-          <input type="password" class="form-control" ng-model="$ctrl.register.pass">
-        </label>
-      </div>
-      <div class="form-group">
-        <label>
-          Retype password
-          <input type="password" class="form-control" ng-model="$ctrl.register.pass2">
-        </label>
-      </div>
-      <button type="submit" class="btn btn-primary" ng-click="$ctrl.register()">Register</button>
-    </form>
+    </div>
   </div>
 
-  <div class="container">
-    <form>
-      <h2>Login</h2>
-      <div class="form-group">
-        <label>
-          Username
-          <input type="text" class="form-control" ng-model="$ctrl.login.user">
-        </label>
+  <!-- Register Modal -->
+  <div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+      <div class="modal-content">
+        <form>
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <h4 class="modal-title" id="myModalLabel">Register</h4>
+          </div>
+          <div class="modal-body">
+            <div class="container">
+              <div class="form-group">
+                <label>
+                  Username
+                  <input type="text" class="form-control" ng-model="$ctrl.register.user">
+                </label>
+              </div>
+              <div class="form-group">
+                <label>
+                  Password
+                  <input type="password" class="form-control" ng-model="$ctrl.register.pass">
+                </label>
+              </div>
+              <div class="form-group">
+                <label>
+                  Retype password
+                  <input type="password" class="form-control" ng-model="$ctrl.register.pass2">
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary" ng-click="$ctrl.register()">Register</button>
+          </div>
+        </div>
       </div>
-      <div class="form-group">
-        <label>
-          Password
-          <input type="password" class="form-control" ng-model="$ctrl.login.pass">
-        </label>
+    </div>
+  </div>
+
+  <!-- Login Modal -->
+  <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+      <div class="modal-content">
+        <form>
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <h4 class="modal-title" id="myModalLabel">Login</h4>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label>
+                Username
+                <input type="text" class="form-control" ng-model="$ctrl.login.user">
+              </label>
+            </div>
+            <div class="form-group">
+              <label>
+                Password
+                <input type="password" class="form-control" ng-model="$ctrl.login.pass">
+              </label>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary" ng-click="$ctrl.login()">Register</button>
+          </div>
+        </div>
       </div>
-      <button type="submit" class="btn btn-primary" ng-click="$ctrl.login()">Login</button>
-    </form>
+    </div>
   </div>
 </body>
 
