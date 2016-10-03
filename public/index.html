@@ -40,11 +40,11 @@
     <form>
       <div class="form-group">
         <label for="latitude">Latitude</label>
-        <input type="number" class="form-control" id="latitude" ng-model="$ctrl.inputFields.latitude">
+        <input type="number" step="any" class="form-control" id="latitude" ng-model="$ctrl.inputFields.position[0]">
       </div>
       <div class="form-group">
         <label for="longitude">Longitude</label>
-        <input type="number" class="form-control" id="longitude" ng-model="$ctrl.inputFields.longitude">
+        <input type="number" step="any" class="form-control" id="longitude" ng-model="$ctrl.inputFields.position[1]">
       </div>
       <div class="form-group">
         <label for="name">Tag Name</label>
@@ -76,10 +76,10 @@
       </div>
       <div class="form-group">
         <label for="image">Image</label>
-        <input type="url" class="form-control" id="image" aria-describedby="fileHelp" ng-model="$ctrl.inputFields.image">
+        <input type="url" class="form-control" id="image" aria-describedby="fileHelp" ng-model="$ctrl.inputFields.icon">
         <small id="fileHelp" class="form-text text-muted">Image URL</small>
       </div>
-      <button type="submit" class="btn btn-primary">Submit</button>
+      <button type="submit" class="btn btn-primary" ng-click="$ctrl.createTag()">Submit</button>
     </form>
   </div>
 </body>
