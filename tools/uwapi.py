@@ -33,12 +33,42 @@ def map_food_services(json):
             'image':       json['logo'],
     }
 
+def map_feds(json):
+    return {
+            'latitude':    json['latitude'],
+            'longitude':   json['longitude'],
+            'name':        json['outlet_name'],
+            'description': json['description'],
+            'category':    "Feds",
+            'image':       json['logo'],
+    }
+
+def map_goose_watch(json):
+    return {
+            'latitude':    json['latitude'],
+            'longitude':   json['longitude'],
+            'name':        "Goose Sighting",
+            'description': json['location'],
+    }
+
 SOURCES = {
     # Food services
     Source(
         name="Food Services",
         url='https://api.uwaterloo.ca/v2/foodservices/locations.json?key=' + API_KEY,
         map_func=map_food_services,
+    ),
+    # Feds
+    Source(
+        name="Feds",
+        url='https://api.uwaterloo.ca/v2/feds/locations.json?key=' + API_KEY,
+        map_func=map_feds,
+    ),
+    # Goose Watch
+    Source(
+        name="Goose Watch",
+        url='https://api.uwaterloo.ca/v2/resources/goosewatch.json?key=' + API_KEY,
+        map_func=map_goose_watch,
     ),
 }
 
@@ -72,6 +102,7 @@ def scrape(site_url, author, auth_token):
         print "Found %s entries" % len(data)
         print "Uploading '%s'..." % source.name
         for datum in get_data(source.url):
+            datum = source.map_func(datum)
             datum['author'] = author
             post(site_url, auth_token, datum)
 
